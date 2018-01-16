@@ -6,8 +6,19 @@ from operator import itemgetter
 import itertools
 import numpy as np
 
+
 # colors for captions
-colors = [ (255,0,0), (0,255,0), (0,0,255), (255, 255, 0), (255,0,255), (0, 255, 255) ]
+# colors = [ (255,0,0), (0,255,0), (0,0,255), (255, 255, 0), (255,0,255), (0, 255, 255) ]
+colors = [
+	(255,255,255),
+	(255,255,255),
+	(255,255,255),
+	(255,255,255),
+	(255,255,255),
+	(255,255,255),
+	(255,255,255),
+	(255,255,255),
+]
 
 # for comparing captions by overlap of words (minus stopwords).
 # there is a much better way to do this
@@ -19,6 +30,7 @@ def resizeResultsToRaw(x, y):
 	yR = y * float(hRaw) / hResults
 	return (xR, yR)
 
+
 def rectArea(r1, r2):
 	dx = min(r1[0]+r1[2], r2[0]+r2[2]) - max(r1[0], r2[0])
 	dy = min(r1[1]+r1[3], r2[1]+r2[3]) - max(r1[1], r2[1])
@@ -27,6 +39,7 @@ def rectArea(r1, r2):
 	else:
 		return 0
 
+
 def rectOverlap(r1, r2):
 	w = max(r1[0]+r1[2], r2[0]+r2[2]) - min(r1[0], r2[0])
 	h = max(r1[1]+r1[3], r2[1]+r2[3]) - min(r1[1], r2[1])
@@ -34,16 +47,19 @@ def rectOverlap(r1, r2):
 	intersectArea = rectArea(r1, r2)
 	return float(intersectArea) / totalArea
 
+
 def getCaptionOverlap(cap1, cap2):
 	c1 = [c for c in cap1.split(' ') if c not in stopwords]
 	c2 = [c for c in cap2.split(' ') if c not in stopwords]
 	overlap = float(len([c for c in c1 if c in c2])) / len(list(set(c1+c2)))
 	return overlap
 
+
 def getNumCaptions(imageName):
 	idxAll = range(len(data["results"]))
 	idxP = [i for i in idxAll if data["results"][i]["img_name"]  == unicode(imageName)][0]
 	return len(data["results"][idxP]["scores"])
+
 
 def getCaptions(imageName, idxC):
 	idxAll = range(len(data["results"]))
@@ -57,11 +73,12 @@ def getCaptions(imageName, idxC):
 	rect = [xR, yR, wR, hR]
 	return (score, caption, rect)
 
+
 def getAllCaptions(frame1, frame2):
 	captions = []
 	for k in range(frame1, frame2):
 		if k % 10 == 0:	print "got %d"%k
-		imageName = "frame%04d.png" % k
+		imageName = "dense%04d.png" % k
 		n = min(len(colors), getNumCaptions(imageName))
 		for i in range(n):
 			score, caption, rect = getCaptions(imageName, i)
@@ -69,6 +86,7 @@ def getAllCaptions(frame1, frame2):
 	captions = sorted(captions, key=itemgetter("scores"))
 	captions.reverse()
 	return captions
+
 
 def mergeCaptions(captions):
 	# sort captions into hashmap whose key is frame #
@@ -155,6 +173,7 @@ def mergeCaptions(captions):
 	captions = newCaptions
 	return captions
 
+
 # from a group of merged caption, pick the one which appears
 # the most times
 def getTopCaption(caption):
@@ -167,6 +186,7 @@ def getTopCaption(caption):
 			topLen = n
 			topCaption = cap
 	return cap
+
 
 def normalizeCaptionScores(captions):
 	frameCount = np.zeros(frame2-frame1)
@@ -253,8 +273,8 @@ def drawCaption(draw, text, myFont, color, rect, thickness, dr, dc, dt, drawCent
 
 
 def drawFrame(k, captions, nCaptions, display):
-	imageName = "frame%04d.png" % k
-	imagePath = frameDir+"frame%04d.png" % k
+	imageName = "dense%04d.png" % k
+	imagePath = frameDir+"dense%04d.png" % k
 	im = Image.open(imagePath)
 	if im.width != wRaw or im.height != hRaw:
 		im = im.resize((wRaw, hRaw), Image.ANTIALIAS)
@@ -311,8 +331,8 @@ frameDir = "originalFrames"
 newFrameDir = "generatedFrames"
 
 # which frames to generate captions between (frame1 = start, frame2 = end)
-frame1 = 1
-frame2 = 100
+frame1 = 0
+frame2 = 5713
 
 # to give viewer a bit more time to read the caption, add (up to) this many frames on both sides of the interval to display the caption
 frameMargin = 8
@@ -325,7 +345,7 @@ minArea = 0.1
 maxArea = 0.55
 
 # how many captions to include in the final video
-numCaptions = 200
+numCaptions = 8
 
 
 
@@ -366,11 +386,10 @@ captions.reverse()
 for k in range(frame1,frame2):
 	if k % 10 == 0:	print "render frame %d"%k
 	im = drawFrame(k, captions, numCaptions, False)
-	im.save(("%s/frame%04d.png"%(newFrameDir,k-frame1)), "png")
+	im.save(("%s/dense%04d.png"%(newFrameDir,k-frame1)), "png")
 
 
 # create video
-cmd ='ffmpeg -r 30 -i '+newFrameDir+'/frame%04d.png -r 30 -c:v libx264 -pix_fmt yuv420p out.mp4'
+cmd ='ffmpeg -r 30 -i '+newFrameDir+'/dense%04d.png -r 30 -c:v libx264 -pix_fmt yuv420p out.mp4'
 print cmd
 os.system(cmd)
-
