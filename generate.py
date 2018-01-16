@@ -8,17 +8,17 @@ import numpy as np
 
 
 # colors for captions
-# colors = [ (255,0,0), (0,255,0), (0,0,255), (255, 255, 0), (255,0,255), (0, 255, 255) ]
-colors = [
-	(255,255,255),
-	(255,255,255),
-	(255,255,255),
-	(255,255,255),
-	(255,255,255),
-	(255,255,255),
-	(255,255,255),
-	(255,255,255),
-]
+colors = [ (255,0,0), (0,255,0), (0,0,255), (255, 255, 0), (255,0,255), (0, 255, 255) ]
+# colors = [
+# 	(255,255,255),
+# 	(255,255,255),
+# 	(255,255,255),
+# 	(255,255,255),
+# 	(255,255,255),
+# 	(255,255,255),
+# 	(255,255,255),
+# 	(255,255,255),
+# ]
 
 # for comparing captions by overlap of words (minus stopwords).
 # there is a much better way to do this
@@ -268,7 +268,7 @@ def drawCaption(draw, text, myFont, color, rect, thickness, dr, dc, dt, drawCent
 		if dc:
 			draw.rectangle((tx1-5, ty1, tx2+5, ty2), fill=color)
 		if dt:
-			draw.text((tx1, yt), line, font=myFont, fill="#000000")
+			draw.text((tx1, yt), line, font=myFont, fill="#ffffff")
  		yt += (myFont.getsize(line)[1])
 
 
