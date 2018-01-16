@@ -325,7 +325,7 @@ jsonPath = 'results.json'
 drawCenter = False
 
 # where the frames of the original video are (set this)
-frameDir = "originalFrames"
+frameDir = "../densecap/image_outputs/"
 
 # where to put the captioned images (create this directory)
 newFrameDir = "generatedFrames"
@@ -345,7 +345,7 @@ minArea = 0.1
 maxArea = 0.55
 
 # how many captions to include in the final video
-numCaptions = 8
+numCaptions = 100
 
 
 
